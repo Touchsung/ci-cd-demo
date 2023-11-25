@@ -28,4 +28,3 @@ jobs:
           docker pull $OLD_IMAGE
           docker tag $OLD_IMAGE $NEW_IMAGE
           docker push $NEW_IMAGE
-          echo ${{ github.event.review.state }}
