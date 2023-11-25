@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - "*"
+      - "v*.*.*"
 env:
   IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/simple-node-app
 
@@ -16,8 +16,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Get Tag Name
-        id: get_tag
-        run: echo "TAG=${GITHUB_REF#refs/tags/}"
-      - name: Display Tag Name
-        run: echo "Tag name is ${{ steps.get_tag.outputs.TAG }}"
+      - name: Connect K8S Cluster
+        run: ${{ secrets.KUBE_CONFIG }}
+      - name: Modify Manifest and Update YAML File
+        run: |
+          export NAME_WITH_TAG=${{ env.IMAGE_NAME }}:${GITHUB_REF#refs/tags/}
+          yq -i '.spec.template.spec.containers[0].image=strenv(NAME_WITH_TAG)' ./manifest/prod/deployment.yaml
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git checkout main
+          git add ./manifest/prod/deployment.yaml
+          git commit -m "release image to ${NAME_WITH_TAG}"
+          git push origin main
+      - name: Deploy to Cluster
+        run: kubectl apply -f ./manifest/prod/.
