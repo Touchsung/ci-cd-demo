@@ -1,0 +1,31 @@
+name: Retag Container Image and Push
+
+on:
+  pull_request_review:
+    types: [submitted]
+    branches:
+      - main
+env:
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/simple-node-app
+
+jobs:
+  retag_container_image_and_push:
+    name: Retag Container Image and Push
+    if: github.event.review.state == 'APPROVED'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Retag Image and Push
+        run: |
+          export OLD_IMAGE=$(yq -r '.spec.template.spec.containers[0].image' ./manifest/dev/deployment.yaml)
+          export NEW_TAG=$GITHUB_HEAD_REF
+          export NEW_IMAGE=${{ env.IMAGE_NAME }}:$NEW_TAG
+          docker pull $OLD_IMAGE
+          docker tag $OLD_IMAGE $NEW_IMAGE
+          docker push $NEW_IMAGE
