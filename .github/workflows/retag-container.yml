@@ -1,10 +1,11 @@
 name: Retag Container Image and Push
 
 on:
-  pull_request_review:
-    types: [submitted]
+  pull_request:
     branches:
       - main
+  pull_request_review:
+    types: [submitted]
 env:
   IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/simple-node-app
 
