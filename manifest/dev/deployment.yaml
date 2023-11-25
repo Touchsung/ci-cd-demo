@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-node-app-touch-deployment-dev
+  namespace: group-4
+  labels:
+    app: simple-node-app-touch-deployment-dev
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 50%
+  selector:
+    matchLabels:
+      app: simple-node-app-touch-deployment-dev
+  template:
+    metadata:
+      labels:
+        app: simple-node-app-touch-deployment-dev
+    spec:
+      containers:
+        - name: simple-node-app-touch-dev
+          image: touchsung/simple-node-app:f49f8eacd1174de88f41df5714187e08a2956cc0
+          ports:
+            - containerPort: 3000
