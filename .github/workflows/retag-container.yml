@@ -11,7 +11,6 @@ env:
 jobs:
   retag_container_image_and_push:
     name: Retag Container Image and Push
-    if: github.event.review.state == 'APPROVED'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,3 +28,4 @@ jobs:
           docker pull $OLD_IMAGE
           docker tag $OLD_IMAGE $NEW_IMAGE
           docker push $NEW_IMAGE
+          echo ${{ github.event.review.state }}
