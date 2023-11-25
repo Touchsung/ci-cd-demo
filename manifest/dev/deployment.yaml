@@ -23,6 +23,6 @@ spec:
     spec:
       containers:
         - name: simple-node-app-touch-dev
-          image: touchsung/simple-node-app:81afb917dcf4fa6897112be20f1f099db5a56401
+          image: touchsung/simple-node-app:f3d7e8fb36f5839bd55036d8b7f604715326a858
           ports:
             - containerPort: 3000
