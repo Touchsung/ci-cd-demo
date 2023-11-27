@@ -2,7 +2,7 @@ name: Retag Container Image and Push
 
 on:
   pull_request:
-    # types: [closed]
+    types: [closed]
     branchs:
       - main
 env:
@@ -10,6 +10,7 @@ env:
 
 jobs:
   retag_container_image_and_push:
+    if: github.event.pull_request.merged == true
     name: Retag Container Image and Push
     runs-on: ubuntu-latest
     steps:
@@ -23,9 +24,8 @@ jobs:
       - name: Retag Image and Push
         run: |
           export OLD_IMAGE=$(yq -r '.spec.template.spec.containers[0].image' ./manifest/dev/deployment.yaml)
-          echo version: ${{ github.event.release.tag_name }}
-          # export NEW_TAG=$GITHUB_HEAD_REF
-          # export NEW_IMAGE=${{ env.IMAGE_NAME }}:$NEW_TAG
-          # docker pull $OLD_IMAGE
-          # docker tag $OLD_IMAGE $NEW_IMAGE
-          # docker push $NEW_IMAGE
+          export NEW_TAG=$GITHUB_HEAD_REF
+          export NEW_IMAGE=${{ env.IMAGE_NAME }}:$NEW_TAG
+          docker pull $OLD_IMAGE
+          docker tag $OLD_IMAGE $NEW_IMAGE
+          docker push $NEW_IMAGE
